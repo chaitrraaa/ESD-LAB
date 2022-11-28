@@ -1,0 +1,15 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<pthread.h>
+pthread_mutex_t count_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond_var = PTHREAD_COND_ININTIALIZER;
+int count=0;
+void *func_call_1();
+void *func_call_2();
+#define count_done 10
+#define halt_1 3
+#define halt_2 6
+int main()
+{
+    
+}
