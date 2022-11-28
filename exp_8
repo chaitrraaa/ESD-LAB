@@ -1,0 +1,44 @@
+#include<stdio.h>
+#include<pthread.h>
+#define Buffer_limit 10
+int Index_value = 0,i,j;
+int Buffer[Buffer_limit];
+pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t Buffer_full = PTHREAD_COND_INITIALIZER;
+pthread_cond_t Buffer_empty = PTHREAD_COND_INITIALIZER;
+void *Consumer()
+{
+    for(j=0;j<Buffer_limit;j++)
+    {
+        pthread_mutex_lock(&mutex);
+        if(Index_value==-1)
+        {
+            pthread_cond_wait(&Buffer_empty,&mutex);
+        }
+        printf("CONSUMER : %d \t",Index_value--);
+        pthread_mutex_unlock(&mutex);
+        pthread_cond_signal(&Buffer_full);
+    }
+}
+void *Producer()
+{
+    pthread_mutex_lock(&mutex);
+    if(Index_value==Buffer_limit)
+    {
+        pthread_cond_wait(&Buffer_full,&mutex);
+    }
+    Buffer[Index_value++] = rand()%50;
+    printf("PRODUCER : %d \t",Index_value);
+    pthread_mutex_unlock(&mutex);
+    pthread_cond_signal(&Buffer_empty);
+}
+
+int main()
+{
+    pthread_t producer_id,consumer_id;
+    pthread_create(&producer_id,NULL,&Producer,NULL);
+    pthread_create(&consumer_id,NULL,&Consumer,NULL);
+    pthread_join(producer_id,NULL);
+    pthread_join(consumer_id,NULL);
+    return 0;
+}
